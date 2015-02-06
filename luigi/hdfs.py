@@ -35,7 +35,7 @@ logger = logging.getLogger('luigi-interface')
 class hdfs(luigi.Config):
     client_version = luigi.IntParameter(default=None)
     effective_user = luigi.Parameter(default=None)
-    snakebite_autoconfig = luigi.BoolParameter()
+    snakebite_autoconfig = luigi.BoolParameter(default=False)
     namenode_host = luigi.Parameter(default=None)
     namenode_port = luigi.IntParameter(default=None)
     client = luigi.Parameter(default=None)
