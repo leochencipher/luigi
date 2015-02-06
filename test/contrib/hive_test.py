@@ -17,14 +17,22 @@
 
 from unittest import TestCase
 
-from luigi import hive
+import luigi
+from luigi.contrib import hive
+import mock
+
+
+class MyHiveTask(hive.HiveQueryTask):
+    param = luigi.Parameter()
+    
+    def query(self):
+        return 'banana banana %s' % self.param
 
 
 class TestHiveTask(TestCase):
 
-    def test_error_cmd(self):
-        self.assertRaises(hive.HiveCommandError, hive.run_hive_cmd, "this is a bogus command and should cause an error;")
-
-    def test_ok_cmd(self):
-        "Test that SHOW TABLES doesn't throw an error"
-        hive.run_hive_cmd("SHOW TABLES;")
+    @mock.patch('luigi.hadoop.run_and_track_hadoop_job')
+    def test_run(self, run_and_track_hadoop_job):
+        success = luigi.run(['MyHiveTask', '--param', 'foo', '--local-scheduler', '--no-lock'])
+        self.assertTrue(success)
+        self.assertEquals('hive', run_and_track_hadoop_job.call_args[0][0][0])
